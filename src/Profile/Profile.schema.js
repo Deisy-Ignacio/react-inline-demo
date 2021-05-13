@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 import * as yup from "yup";
 
 export const schema = {
@@ -8,8 +9,22 @@ export const schema = {
     label: "",
     placeholder: "Enter your first name",
     defaultValue: "",
-    errorMessage: "",
-    validation: yup.string().required(),
+    validation: yup
+      .string()
+      .required()
+      .min(1, "It should at least 1 character"),
+  },
+  bio: {
+    name: "bio",
+    id: "bio",
+    type: "text",
+    label: "",
+    placeholder: "",
+    defaultValue: "",
+    validation: yup
+      .string()
+      .required()
+      .max(500, "It should be ${max} characters or less"),
   },
   age: {
     name: "age",
@@ -18,7 +33,6 @@ export const schema = {
     label: "",
     placeholder: "Enter your age",
     defaultValue: "",
-    errorMessage: "Required field",
     validation: yup.number().positive().integer().required(),
   },
 };

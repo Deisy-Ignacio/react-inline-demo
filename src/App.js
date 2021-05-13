@@ -1,11 +1,11 @@
-import Profile from "./Profile/Profile";
+import ProfilePage from "./Profile/Profile";
 
 import "./App.css";
 
 function App() {
   return (
     <>
-      <Profile />
+      <ProfilePage />
     </>
   );
 }

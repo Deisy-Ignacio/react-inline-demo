@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -5,9 +6,6 @@ import Editable from "./../Editable";
 import InputText from "../FormElements/InputText";
 
 import { schema, resolver } from "./Profile.schema";
-import { useEffect } from "react";
-
-const dataFromAPI = { firstname: "José Lugo 🤠", age: 28 };
 
 function Page({ children }) {
   return (
@@ -19,27 +17,36 @@ function Card({ children }) {
   return <div className="bg-white p-10 rounded-lg mb-12">{children}</div>;
 }
 
-export default function Profile() {
-  const methods = useForm({ resolver: yupResolver(resolver) });
+function Profile({ data: serverData }) {
+  const [data, setData] = useState(serverData);
+
+  const methods = useForm({
+    mode: "onChange",
+    resolver: yupResolver(resolver),
+    defaultValues: data,
+  });
 
   const fields = methods.watch();
 
   const onSubmit = (data) => console.log(data);
 
-  useEffect(() => {
-    Object.keys(dataFromAPI).forEach((key) => {
-      methods.setValue(key, dataFromAPI[key], {});
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const saveField = (fieldToUpdate) =>
+    setData((current) => ({
+      ...current,
+      [fieldToUpdate]: fields[fieldToUpdate],
+    }));
+
+  const resetField = (fieldToReset) =>
+    methods.setValue(fieldToReset, data[fieldToReset]);
 
   return (
-    <Page>
+    <>
       <Card>
         <pre>
-          <code>api_response: {JSON.stringify(dataFromAPI, null, "	")}</code>
+          <code>reduxStore: {JSON.stringify(data, null, "	")}</code>
         </pre>
       </Card>
+
       <Card>
         <pre>
           <code>schema_fields: {JSON.stringify(fields, null, "	")}</code>
@@ -50,37 +57,70 @@ export default function Profile() {
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             {/* First name field */}
             <Editable
+              {...schema.firstname}
               text={fields.firstname}
-              placeholder={schema.firstname.placeholder}
+              saveField={saveField}
+              resetField={resetField}
               customClass={"text-4xl mb-4"}
               customInput={
                 <InputText
                   {...schema.firstname}
                   customClass={
-                    "text-4xl mb-4 border-blue-300 bg-gray-200 focus:bg-blue-400 focus:shadow-outline"
-                  }
-                />
-              }
-            />
-            {/* Age field */}
-            <Editable
-              text={fields.age}
-              placeholder={schema.age.placeholder}
-              customClass={"text-4xl mb-4"}
-              customInput={
-                <InputText
-                  {...schema.age}
-                  customClass={
-                    "text-4xl mb-4 border-blue-300 bg-gray-200 focus:bg-blue-400 focus:shadow-outline"
+                    "text-4xl mb-4 bg-gray-200 border-2 border-gray-200 outline-none inline"
                   }
                 />
               }
             />
 
-            <button type="submit">Submit</button>
+            {/* First name field */}
+            <Editable
+              {...schema.bio}
+              text={fields.bio}
+              saveField={saveField}
+              resetField={resetField}
+              customClass={"text-4xl mb-4"}
+              customInput={
+                <InputText
+                  {...schema.bio}
+                  customClass={
+                    "text-4xl mb-4 bg-gray-200 border-2 border-gray-200 outline-none inline"
+                  }
+                />
+              }
+            />
+
+            {/* Age field */}
+            <Editable
+              {...schema.age}
+              text={fields.age}
+              saveField={saveField}
+              resetField={resetField}
+              customClass={"text-4xl mb-4"}
+              customInput={
+                <InputText
+                  {...schema.age}
+                  customClass={
+                    "text-4xl mb-4 bg-gray-200 border-2 border-gray-200 outline-none inline"
+                  }
+                />
+              }
+            />
           </form>
         </FormProvider>
       </Card>
+    </>
+  );
+}
+
+export default function ProfilePage() {
+  const dataFromRedux = {
+    firstname: "José Lugo 🤠",
+    age: "28",
+    bio: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+  };
+  return (
+    <Page>
+      <Profile data={dataFromRedux} />
     </Page>
   );
 }

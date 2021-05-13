@@ -5,31 +5,28 @@ export default function TextInput({
   id,
   type = "text",
   label = false,
-  placeholder = "",
-  defaultValue = "",
-  errors = false,
   errorMessage = "",
-  customClass = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300 bg-gray-100 mb-8",
+  customClass = "",
   ...props
 }) {
-  const { register } = useFormContext();
+  const { register, ...methods } = useFormContext();
+  const hasError = methods.formState.errors[name]?.message || false;
+
   return (
     <div>
       <input
-        className={customClass}
+        className={`${customClass} ${
+          hasError
+            ? "border-red-300 focus:outline-red-300"
+            : "border-green-300 focus:outline-green-300"
+        }`}
         name={name}
         id={id}
         type={type}
-        placeholder={placeholder}
-        defaultValue={defaultValue}
         {...register(name)}
         {...props}
       />{" "}
-      {errorMessage && errors && (
-        <p>
-          <span>{errorMessage}</span>
-        </p>
-      )}
+      <div>{hasError}</div>
     </div>
   );
 }
